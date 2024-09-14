@@ -1,0 +1,17 @@
+{
+    "name": "content-ee-shared-testing",
+    "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
+    "projectType": "library",
+    "sourceRoot": "libs/content-ee/shared/testing/src",
+    "prefix": "alfresco-dbp",
+    "targets": {
+        "lint": {
+            "executor": "@nx/eslint:lint",
+            "options": {
+                "lintFilePatterns": ["libs/content-ee/shared/testing/src/**/*.ts", "libs/content-ee/shared/testing/src/**/*.html"]
+            },
+            "outputs": ["{options.outputFile}"]
+        }
+    },
+    "tags": ["scope:content-ee-shared-testing", "type:library"]
+}

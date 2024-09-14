@@ -1,0 +1,314 @@
+<div class="body">
+  <h1>Upload your file plan here!</h1>
+  <div class="example-action-buttons">
+    <button mat-button (click)="accordion.openAll()">Expand All</button>
+    <button mat-button (click)="accordion.closeAll()">Collapse All</button>
+  </div>
+  <mat-accordion class="example-headers-align" [multi]="false">
+    <mat-expansion-panel [expanded]="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title> Get Started With The File Plan </mat-panel-title>
+        <mat-panel-description>
+          <div>
+            The File Plan is a container for records, categories, folders and
+            retention schedules and each have an appropriate set of actions
+          </div>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <!-- description with image here-->
+      <div style="width: 100%; padding: 20px; margin: 30px">
+        <img
+          src="./assets/images/file-plan.png"
+          style="width: 10%; height: auto; float: left"
+        />
+        <!--close left div-->
+        <div style="width: 50%; float: left; padding: 10px">
+          The File Plan is a container for records, folders, categories and
+          retention schedules. It’s effectively a virtual filing cabinet for
+          storing records, and is the basic structure of Records Management.
+          This structure lets you classify and group records with similar
+          characteristics. The top level of the File Plan is created when you
+          create a Records Management site. This is like an empty virtual filing
+          cabinet - you then add drawers (categories), folders, and records to
+          it.
+        </div>
+        <!--close right div-->
+      </div>
+      <!--close container-->
+      <!-- put upload code here -->
+      <Ngx-CSVtoJSON
+        (onConvert)="convert($event); accordion.openAll()"
+        (onFail)="onError($event)"
+      ></Ngx-CSVtoJSON>
+      <!-- end upload code -->
+    </mat-expansion-panel>
+    <mat-expansion-panel #importDisplayPanel>
+      <mat-expansion-panel-header>
+        <mat-panel-title> Import Display </mat-panel-title>
+        <mat-panel-description>
+          Review the uploaded file here
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <div class="addFilePlan">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="isShowFilePlanForm = !isShowFilePlanForm"
+        >
+          Add File Plan
+        </button>
+
+        <div class="addFilePlanForm" *ngIf="isShowFilePlanForm">
+          <mat-form-field>
+            <mat-label>GRS ID</mat-label>
+            <input matInput />
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Record title</mat-label>
+            <input matInput />
+          </mat-form-field>
+
+          <mat-form-field>
+            <mat-label>Retention</mat-label>
+            <mat-select>
+              <mat-option value="one">1 year</mat-option>
+              <mat-option value="two">5 year</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <button mat-raised-button color="warn" (click)="addManualFilePlan()">
+            Add
+          </button>
+        </div>
+      </div>
+      <div class="tableContainer">
+        <table
+          id="filePlanTable"
+          mat-table
+          [dataSource]="dataSource"
+          class="mat-elevation-z8"
+        >
+          <!-- Checkbox Column -->
+          <ng-container matColumnDef="select">
+            <th mat-header-cell *matHeaderCellDef>
+              <mat-checkbox
+                (change)="$event ? toggleAllRows() : null"
+                [checked]="selection.hasValue() && isAllSelected()"
+                [indeterminate]="selection.hasValue() && !isAllSelected()"
+                [aria-label]="checkboxLabel()"
+              >
+              </mat-checkbox>
+            </th>
+            <td mat-cell *matCellDef="let row">
+              <mat-checkbox
+                (click)="$event.stopPropagation()"
+                (change)="$event ? selection.toggle(row) : null"
+                [checked]="selection.isSelected(row)"
+                [aria-label]="checkboxLabel(row)"
+              >
+              </mat-checkbox>
+            </td>
+          </ng-container>
+
+          <!-- grs Column -->
+          <ng-container matColumnDef="GRSID">
+            <th mat-header-cell *matHeaderCellDef>GRSID</th>
+            <td mat-cell *matCellDef="let element">{{ element.GRSID }}</td>
+          </ng-container>
+          <!-- first Name Column -->
+          <ng-container matColumnDef="RecordTitle">
+            <th mat-header-cell *matHeaderCellDef>Record Title</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.RecordTitle }}
+            </td>
+          </ng-container>
+
+          <!-- Record Type Column -->
+          <ng-container matColumnDef="RecordType">
+            <th mat-header-cell *matHeaderCellDef>RecordType</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.RecordType }}
+            </td>
+          </ng-container>
+
+          <!-- Retention Type Column -->
+          <ng-container matColumnDef="RetentionType">
+            <th mat-header-cell *matHeaderCellDef>RetentionType</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.RetentionType }}
+            </td>
+          </ng-container>
+
+          <!-- Longer retention authorized -->
+          <ng-container matColumnDef="LongerRetentionAuthorized">
+            <th mat-header-cell *matHeaderCellDef>LongerRetentionAuthorized</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.LongerRetentionAuthorized }}
+            </td>
+          </ng-container>
+
+          <!-- event type-->
+          <ng-container matColumnDef="EventTypeGeneral">
+            <th mat-header-cell *matHeaderCellDef>EventTypeGeneral</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.EventTypeGeneral }}
+            </td>
+          </ng-container>
+
+          <!-- Classification General -->
+          <ng-container matColumnDef="ClassificationGeneral">
+            <th mat-header-cell *matHeaderCellDef>ClassificationGeneral</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.ClassificationGeneral }}
+            </td>
+          </ng-container>
+
+          <!-- Deviations Allowed -->
+          <ng-container matColumnDef="DeviationsAllowed">
+            <th mat-header-cell *matHeaderCellDef>DeviationsAllowed</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.DeviationsAllowed }}
+            </td>
+          </ng-container>
+
+          <!-- Full disposition instruction -->
+          <ng-container matColumnDef="FullDispositionInstruction">
+            <th mat-header-cell *matHeaderCellDef>
+              FullDispositionInstruction
+            </th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.FullDispositionInstruction }}
+            </td>
+          </ng-container>
+
+          <!-- Disposition Authority -->
+          <ng-container matColumnDef="DispositionAuthority">
+            <th mat-header-cell *matHeaderCellDef>DispositionAuthority</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.DispositionAuthority }}
+            </td>
+          </ng-container>
+
+          <!-- Superseded By-->
+          <ng-container matColumnDef="Supersededby">
+            <th mat-header-cell *matHeaderCellDef>Supersededby</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.Supersededby }}
+            </td>
+          </ng-container>
+
+          <!-- Last UPdated -->
+          <ng-container matColumnDef="LastUpdated">
+            <th mat-header-cell *matHeaderCellDef>LastUpdated</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.LastUpdated }}
+            </td>
+          </ng-container>
+
+          <!-- comments -->
+          <ng-container matColumnDef="Comments">
+            <th mat-header-cell *matHeaderCellDef>Comments</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.Comments }}
+            </td>
+          </ng-container>
+
+          <!-- Legal Citation -->
+          <ng-container matColumnDef="LegalCitation">
+            <th mat-header-cell *matHeaderCellDef>LegalCitation</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.LegalCitation }}
+            </td>
+          </ng-container>
+
+          <!-- Disposition-->
+          <ng-container matColumnDef="Disposition">
+            <th mat-header-cell *matHeaderCellDef>Disposition</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.Disposition }}
+            </td>
+          </ng-container>
+
+          <!-- Retention years-->
+          <ng-container matColumnDef="RetentionYears">
+            <th mat-header-cell *matHeaderCellDef>RetentionYears</th>
+            <td mat-cell *matCellDef="let element">
+              {{ element.RetentionYears }}
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+          <tr
+            mat-row
+            *matRowDef="let row; columns: columnsToDisplay"
+            (click)="selection.toggle(row)"
+          ></tr>
+        </table>
+      </div>
+
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="submitFilePlanButton()"
+      >
+        SUBMIT
+      </button>
+      <!-- <pre>
+          <h3>Selected :</h3>
+          {{selection.selected | json}}
+        </pre> -->
+    </mat-expansion-panel>
+
+    <!-- example to repeate expansion panels
+      https://stackblitz.com/edit/angular-etxgcr?file=src%2Fapp%2Fapp.component.html
+      -->
+
+    <mat-expansion-panel #confirmationPanel>
+      <mat-expansion-panel-header>
+        <mat-panel-title> Confirmation </mat-panel-title>
+        <mat-panel-description>
+          <!-- <mat-icon>date_range</mat-icon> -->
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <!-- put sidenav logic here -->
+      <!-- <mat-drawer-container class="example-container" autosize>
+          <div class="example-sidenav-content">
+            <mat-accordion style="width: 100%">
+              <mat-expansion-panel *ngFor="let day of days">
+                <mat-expansion-panel-header (click)="drawer.toggle()">
+                  <mat-panel-title>
+                    <mat-icon>assignment</mat-icon>
+                    {{ day.date }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+                <p *ngFor="let subDay of day.subDay" class="grid5">
+                  <mat-icon>folder</mat-icon>
+                  {{ subDay.name }}
+                </p>
+              </mat-expansion-panel>
+            </mat-accordion>
+          </div>
+          <mat-drawer #drawer class="example-sidenav" mode="side" position="end">
+            <p>authority: RM department</p>
+            <p>cutoff: immediately</p>
+            <p>delete: 10 years from cutoff</p>
+          </mat-drawer>
+        </mat-drawer-container> -->
+      <!-- end sidenav -->
+      <!-- <h1>Please Check AGS for the File Plans</h1> -->
+      <!-- <adf-document-list
+        #documentList
+        currentFolderId="-root-"
+        (preview)="showPreview($event)"
+      >
+      </adf-document-list>
+      <adf-pagination
+        [target]="documentList"
+        [supportedPageSizes]="[5, 10, 15, 20]"
+        [pagination]="10"
+      >
+      </adf-pagination> -->
+    </mat-expansion-panel>
+  </mat-accordion>
+</div>

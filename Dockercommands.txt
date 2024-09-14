@@ -1,0 +1,14 @@
+docker stop fileplanuploadadw5
+docker rm fileplanuploadadw5
+docker rmi wildsdocker/fileplanuploadadw5:v1 --force
+
+sudo npm run build content-ee
+
+docker buildx build --load --platform linux/amd64,linux/arm64 -t wildsdocker/fileplanuploadadw5:v1 .
+
+docker run -d -it -p 4200:80 \
+--name fileplanuploadadw5 \
+wildsdocker/fileplanuploadadw5:v1
+
+
+docker push wildsdocker/fileplanuploadadw5:v1

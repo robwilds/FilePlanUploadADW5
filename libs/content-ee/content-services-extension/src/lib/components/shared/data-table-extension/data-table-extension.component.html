@@ -1,24 +1,30 @@
-<adf-datatable (showRowContextMenu)="showRowContextMenu.emit($event)"
-               [columns]="columns"
-               [contextMenu]="contextMenu"
-               [data]="data"
-               [loading]="loading"
-               [showHeader]="showHeader"
-               [stickyHeader]="true"
-               [selectionMode]="selectionMode"
-               [multiselect]="multiselect"
-               [isResizingEnabled]="true"
-               [blurOnResize]="false">
-
-    <adf-loading-content-template>
-        <ng-template>
-            <mat-progress-spinner color="primary" mode="indeterminate"></mat-progress-spinner>
-        </ng-template>
-    </adf-loading-content-template>
-
-    <adf-no-content-template>
-        <ng-template>
-            <ng-content select="adf-custom-empty-content-template"></ng-content>
-        </ng-template>
-    </adf-no-content-template>
+<button mat-flat-button (click)="openFilePlan('3000ms', '1500ms')">
+  Import File Plans
+</button>
+<adf-datatable
+  (showRowContextMenu)="showRowContextMenu.emit($event)"
+  [columns]="columns"
+  [contextMenu]="contextMenu"
+  [data]="data"
+  [loading]="loading"
+  [showHeader]="showHeader"
+  [stickyHeader]="true"
+  [selectionMode]="selectionMode"
+  [multiselect]="multiselect"
+  [isResizingEnabled]="true"
+  [blurOnResize]="false"
+>
+  <adf-loading-content-template>
+    <ng-template>
+      <mat-progress-spinner
+        color="primary"
+        mode="indeterminate"
+      ></mat-progress-spinner>
+    </ng-template>
+  </adf-loading-content-template>
+  <adf-no-content-template>
+    <ng-template>
+      <ng-content select="adf-custom-empty-content-template"></ng-content>
+    </ng-template>
+  </adf-no-content-template>
 </adf-datatable>

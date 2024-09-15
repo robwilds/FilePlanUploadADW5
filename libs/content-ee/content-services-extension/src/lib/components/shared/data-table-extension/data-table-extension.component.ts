@@ -6,76 +6,120 @@
  * agreement is prohibited.
  */
 
-import { AfterContentInit, Component, EventEmitter, Input, Output, ViewChild, ViewEncapsulation } from '@angular/core';
 import {
-    AppConfigService,
-    DataTableComponent,
-    DataTableSchema,
-    LoadingContentTemplateDirective,
-    NoContentTemplateDirective,
-    ShowHeaderMode,
-    ThumbnailService
-} from '@alfresco/adf-core';
-import { ContentService, ShareDataTableAdapter } from '@alfresco/adf-content-services';
-import { CommonModule } from '@angular/common';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { NodePaging } from '@alfresco/js-api';
+  AfterContentInit,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ViewChild,
+  ViewEncapsulation,
+} from "@angular/core";
+import {
+  AppConfigService,
+  DataTableComponent,
+  DataTableSchema,
+  LoadingContentTemplateDirective,
+  NoContentTemplateDirective,
+  ShowHeaderMode,
+  ThumbnailService,
+} from "@alfresco/adf-core";
+import {
+  ContentService,
+  ShareDataTableAdapter,
+} from "@alfresco/adf-content-services";
+import { CommonModule } from "@angular/common";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { NodePaging } from "@alfresco/js-api";
+import { FileplanuploadComponent } from "../../../../../../../../apps/content-ee/src/app/components/fileplanupload/fileplanupload.component";
+import { MatDialog } from "@angular/material/dialog";
 
 @Component({
-    standalone: true,
-    imports: [CommonModule, MatProgressSpinnerModule, NoContentTemplateDirective, LoadingContentTemplateDirective, DataTableComponent],
-    selector: 'adw-data-table-extension',
-    templateUrl: './data-table-extension.component.html',
-    styleUrls: ['./data-table-extension.component.scss'],
-    encapsulation: ViewEncapsulation.None
+  standalone: true,
+  imports: [
+    FileplanuploadComponent,
+    CommonModule,
+    MatProgressSpinnerModule,
+    NoContentTemplateDirective,
+    LoadingContentTemplateDirective,
+    DataTableComponent,
+  ],
+  selector: "adw-data-table-extension",
+  templateUrl: "./data-table-extension.component.html",
+  styleUrls: ["./data-table-extension.component.scss"],
+  encapsulation: ViewEncapsulation.None,
 })
-export class DataTableExtensionComponent extends DataTableSchema implements AfterContentInit {
-    static PRESET_KEY = 'extension.preset';
+export class DataTableExtensionComponent
+  extends DataTableSchema
+  implements AfterContentInit
+{
+  static PRESET_KEY = "extension.preset";
 
-    @Input()
-    loading = true;
+  @Input()
+  loading = true;
 
-    @Input()
-    showHeader: ShowHeaderMode = ShowHeaderMode.Always;
+  @Input()
+  showHeader: ShowHeaderMode = ShowHeaderMode.Always;
 
-    @Input()
-    selectionMode = 'multiple';
+  @Input()
+  selectionMode = "multiple";
 
-    @Input()
-    multiselect = false;
+  @Input()
+  multiselect = false;
 
-    @Input()
-    contextMenu = false;
+  @Input()
+  contextMenu = false;
 
-    @Input()
-    set items(nodePaging: NodePaging) {
-        if (this.data) {
-            this.data.loadPage(nodePaging);
-        }
+  @Input()
+  set items(nodePaging: NodePaging) {
+    if (this.data) {
+      this.data.loadPage(nodePaging);
     }
+  }
 
-    @Input()
-    sorting = ['title', 'asc'];
+  @Input()
+  sorting = ["title", "asc"];
 
-    @Output()
-    showRowContextMenu = new EventEmitter();
+  @Output()
+  showRowContextMenu = new EventEmitter();
 
-    @ViewChild(DataTableComponent)
-    dataTable: DataTableComponent;
+  @ViewChild(DataTableComponent)
+  dataTable: DataTableComponent;
 
-    data: ShareDataTableAdapter;
+  data: ShareDataTableAdapter;
 
-    constructor(appConfig: AppConfigService, private thumbnailService: ThumbnailService, private contentService: ContentService) {
-        super(appConfig, DataTableExtensionComponent.PRESET_KEY, {});
-        this.data = new ShareDataTableAdapter(this.thumbnailService, this.contentService, null, null, null);
-        this.data.setImageResolver(this.imageResolver);
-    }
+  constructor(
+    appConfig: AppConfigService,
+    private thumbnailService: ThumbnailService,
+    private contentService: ContentService,
+    public dialog: MatDialog
+  ) {
+    super(appConfig, DataTableExtensionComponent.PRESET_KEY, {});
+    this.data = new ShareDataTableAdapter(
+      this.thumbnailService,
+      this.contentService,
+      null,
+      null,
+      null
+    );
+    this.data.setImageResolver(this.imageResolver);
+  }
 
-    ngAfterContentInit() {
-        this.createDatatableSchema();
-    }
+  ngAfterContentInit() {
+    this.createDatatableSchema();
+  }
 
-    imageResolver(): string {
-        return 'material-icons://library_books';
-    }
+  imageResolver(): string {
+    return "material-icons://library_books";
+  }
+  openFilePlan(
+    enterAnimationDuration: string,
+    exitAnimationDuration: string
+  ): void {
+    this.dialog.open(FileplanuploadComponent, {
+      width: "1200px",
+      enterAnimationDuration,
+      exitAnimationDuration,
+    });
+  }
 }

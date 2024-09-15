@@ -56,6 +56,7 @@ import {
 import { APP_ROUTES } from "./app.routes";
 import { MatIconRegistry } from "@angular/material/icon";
 import { FileplanuploadComponent } from "./components/fileplanupload/fileplanupload.component";
+import { MatExpansionModule } from "@angular/material/expansion";
 
 registerLocaleData(localeFr);
 registerLocaleData(localeDe);
@@ -76,6 +77,8 @@ registerLocaleData(localeSv);
 
 @NgModule({
   imports: [
+    FileplanuploadComponent,
+    MatExpansionModule,
     NgxCSVtoJSONModule,
     AuthModule.forRoot({ useHash: true }),
     BrowserModule,
@@ -105,7 +108,7 @@ registerLocaleData(localeSv);
     },
     provideTranslations("app", "assets"),
   ],
-  declarations: [AppComponent, FileplanuploadComponent],
+  declarations: [AppComponent],
   bootstrap: [AppComponent],
 })
 export class AppModule {

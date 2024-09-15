@@ -1,12 +1,18 @@
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { MatAccordion } from "@angular/material/expansion";
+import {
+  MatAccordion,
+  MatExpansionModule,
+  MatExpansionPanel,
+} from "@angular/material/expansion";
 import { SelectionModel } from "@angular/cdk/collections";
 import { MatTableDataSource } from "@angular/material/table";
 import { HttpClient, HttpHeaders } from "@angular/common/http";
-import { MatExpansionPanel } from "@angular/material/expansion";
-
-//import { DocumentListComponent } from "@alfresco/adf-content-services";
-
+import { MatCheckboxModule } from "@angular/material/checkbox";
+import { NgxCSVtoJSONModule } from "ngx-csvto-json";
+import { MatCommonModule } from "@angular/material/core";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatSelectModule } from "@angular/material/select";
+import { MatTableModule } from "@angular/material/table";
 export interface FilePlanData {
   position: number;
   grsId: string;
@@ -29,6 +35,16 @@ export interface FilePlanData {
   selector: "app-ags-fileupload",
   templateUrl: "./fileplanupload.component.html",
   styleUrls: ["./fileplanupload.component.scss"],
+  standalone: true,
+  imports: [
+    MatExpansionModule,
+    MatCheckboxModule,
+    NgxCSVtoJSONModule,
+    MatCommonModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatTableModule,
+  ],
 })
 export class FileplanuploadComponent implements OnInit {
   //logic to get list of file plans, categories and children

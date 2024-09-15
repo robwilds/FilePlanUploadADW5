@@ -69,7 +69,7 @@ export class FileplanuploadComponent implements OnInit {
   apiURL =
     window.location.protocol +
     "//" +
-    window.location.host.replace(":8080", ":9600") +
+    window.location.host.replace(":8080", ":9600").replace(":4200", ":9600") +
     "/createfileplan";
 
   name = "Angular";

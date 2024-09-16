@@ -13,6 +13,9 @@ import { MatCommonModule } from "@angular/material/core";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatSelectModule } from "@angular/material/select";
 import { MatTableModule } from "@angular/material/table";
+import { MatIconModule } from "@angular/material/icon";
+import { MatDividerModule } from "@angular/material/divider";
+import { MatButtonModule } from "@angular/material/button";
 export interface FilePlanData {
   position: number;
   grsId: string;
@@ -37,6 +40,9 @@ export interface FilePlanData {
   styleUrls: ["./fileplanupload.component.scss"],
   standalone: true,
   imports: [
+    MatIconModule,
+    MatButtonModule,
+    MatDividerModule,
     MatExpansionModule,
     MatCheckboxModule,
     NgxCSVtoJSONModule,
@@ -55,7 +61,7 @@ export class FileplanuploadComponent implements OnInit {
     //private ngxCsvParser: NgxCsvParser,
     private http: HttpClient
   ) {}
-
+  confirmMessage = "";
   showFiller = false;
   dataSource: any;
   columnsToDisplay = [];
@@ -154,6 +160,12 @@ export class FileplanuploadComponent implements OnInit {
             "   result is ->>" +
             JSON.stringify(res)
         );
+
+        if (JSON.stringify(res).includes("success")) {
+          this.confirmMessage = "File Plans added successfully!";
+        } else {
+          this.confirmMessage = "There was an error";
+        }
       });
   }
 

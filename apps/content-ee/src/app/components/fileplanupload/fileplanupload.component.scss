@@ -51,3 +51,13 @@
     white-space: nowrap;
   }
   
+  button {
+    background: var(--mdc-protected-button-label-text-color, inherit);
+    width: 100px;
+    border: none;
+    outline: none;
+    color: #fff;
+    height: 35px;
+    border-radius: 30px;
+    margin-top: 20px;
+    }

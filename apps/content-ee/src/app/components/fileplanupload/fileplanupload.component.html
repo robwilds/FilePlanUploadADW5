@@ -1,18 +1,18 @@
 <div class="body">
-  <h1>Upload your file plan here!</h1>
+  <!-- <h1>Upload your file plan here!</h1> -->
   <div class="example-action-buttons">
-    <button mat-button (click)="accordion.openAll()">Expand All</button>
-    <button mat-button (click)="accordion.closeAll()">Collapse All</button>
+    <!-- <button mat-button (click)="accordion.openAll()">Expand All</button>
+    <button mat-button (click)="accordion.closeAll()">Collapse All</button> -->
   </div>
   <mat-accordion class="example-headers-align" [multi]="false">
     <mat-expansion-panel [expanded]="true">
       <mat-expansion-panel-header>
         <mat-panel-title> Get Started With The File Plan </mat-panel-title>
         <mat-panel-description>
-          <div>
+          <!-- <div>
             The File Plan is a container for records, categories, folders and
             retention schedules and each have an appropriate set of actions
-          </div>
+          </div> -->
         </mat-panel-description>
       </mat-expansion-panel-header>
       <!-- description with image here-->
@@ -22,7 +22,15 @@
           style="width: 10%; height: auto; float: left"
         />
         <!--close left div-->
-        <div style="width: 50%; float: left; padding: 10px">
+        <div
+          style="
+            width: 50%;
+            float: left;
+            padding: 20px;
+            text-align: justify;
+            text-justify: inter-word;
+          "
+        >
           The File Plan is a container for records, folders, categories and
           retention schedules. It’s effectively a virtual filing cabinet for
           storing records, and is the basic structure of Records Management.
@@ -36,10 +44,13 @@
       </div>
       <!--close container-->
       <!-- put upload code here -->
+
       <Ngx-CSVtoJSON
+        style="background-color: brown"
         (onConvert)="convert($event); accordion.openAll()"
         (onFail)="onError($event)"
       ></Ngx-CSVtoJSON>
+
       <!-- end upload code -->
     </mat-expansion-panel>
     <mat-expansion-panel #importDisplayPanel>
@@ -50,13 +61,13 @@
         </mat-panel-description>
       </mat-expansion-panel-header>
       <div class="addFilePlan">
-        <button
+        <!-- <button
           mat-raised-button
           color="primary"
           (click)="isShowFilePlanForm = !isShowFilePlanForm"
         >
           Add File Plan
-        </button>
+        </button> -->
 
         <div class="addFilePlanForm" *ngIf="isShowFilePlanForm">
           <mat-form-field>
@@ -271,6 +282,7 @@
           <!-- <mat-icon>date_range</mat-icon> -->
         </mat-panel-description>
       </mat-expansion-panel-header>
+      <h2>{{ confirmMessage }}</h2>
       <!-- put sidenav logic here -->
       <!-- <mat-drawer-container class="example-container" autosize>
           <div class="example-sidenav-content">

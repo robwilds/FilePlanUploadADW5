@@ -1,3 +1,30 @@
+# Customization getting started
+In order to utilize this customization within an existing Alfresco docker collection, add the following section to the docker-compose.yml for alfresco
+
+  fileplanuploadadw5:
+    image: wildsdocker/fileplanuploadadw5:v1
+    ports:
+      - 4200:80
+      
+# Customization details
+This build of ADW 5 has a component for uploading file plan spreadsheets and creating retention categories with the file plan in Alfresco.
+
+In order to utilize the angular app, a modification must be made to the existing alfresco nginx provided proxy container (running nginx).  On the "proxy" container, edit the etc/nginx/nginx.conf and add the following entry in the server section
+
+                                                                    
+        location /fileupload/ {                                                                  
+            proxy_pass http://fileplanuploadadw5/;                                               
+            absolute_redirect off;                                                               
+        }     
+
+this will setup an endpoint like:  localhost:8080/fileupload which will proxy over to this custom ADW app
+
+#  Using File Plan Upload
+
+Once the angular app loads, click on "All Libraries"  .  You will see a button called import file plans.  clicking this button will show a dialog where you can select the csv file that contains the file plans.  Selecting a file will show the next screen where you can select/de-select rows then click submit.  
+
+The confirmation screen will indicate success or failure of the upload.  If successful, you can now go to the library> REcords Management and view the file plans in ADW.  Share interface will show more details about the file plan such as the retention schedule
+
 # Alfresco Applications
 
 The repository is based on the [Nx Workspace](https://nx.dev/) and contains the following Alfresco applications and libraries built with Angular and [ADF](https://github.com/Alfresco/alfresco-ng2-components):

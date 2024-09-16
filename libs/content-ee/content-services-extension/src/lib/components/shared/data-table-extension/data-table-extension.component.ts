@@ -33,10 +33,11 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { NodePaging } from "@alfresco/js-api";
 import { FileplanuploadComponent } from "../../../../../../../../apps/content-ee/src/app/components/fileplanupload/fileplanupload.component";
 import { MatDialog } from "@angular/material/dialog";
-
+import { MatButtonModule } from "@angular/material/button";
 @Component({
   standalone: true,
   imports: [
+    MatButtonModule,
     FileplanuploadComponent,
     CommonModule,
     MatProgressSpinnerModule,

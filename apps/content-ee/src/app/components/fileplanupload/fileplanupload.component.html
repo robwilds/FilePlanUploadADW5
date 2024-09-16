@@ -16,15 +16,15 @@
         </mat-panel-description>
       </mat-expansion-panel-header>
       <!-- description with image here-->
-      <div style="width: 100%; padding: 20px; margin: 30px">
+      <div style="width: 100%; margin: 20px; margin: 30px">
         <img
           src="./assets/images/file-plan.png"
-          style="width: 10%; height: auto; float: left"
+          style="width: 10%; height: auto; float: left; padding: 20px"
         />
         <!--close left div-->
         <div
           style="
-            width: 50%;
+            width: 40%;
             float: left;
             padding: 20px;
             text-align: justify;
@@ -44,13 +44,13 @@
       </div>
       <!--close container-->
       <!-- put upload code here -->
-
-      <Ngx-CSVtoJSON
-        style="background-color: brown"
-        (onConvert)="convert($event); accordion.openAll()"
-        (onFail)="onError($event)"
-      ></Ngx-CSVtoJSON>
-
+      <div style="padding-top: 20px">
+        <Ngx-CSVtoJSON
+          style="margin: 5px"
+          (onConvert)="convert($event); accordion.openAll()"
+          (onFail)="onError($event)"
+        ></Ngx-CSVtoJSON>
+      </div>
       <!-- end upload code -->
     </mat-expansion-panel>
     <mat-expansion-panel #importDisplayPanel>

@@ -2,10 +2,12 @@
 In order to utilize this customization within an existing Alfresco docker collection, add the following section to the docker-compose.yml for alfresco
 
 
+```
 fileplanuploadadw5:
   image: wildsdocker/fileplanuploadadw5:v1
-    ports:
-      - 4200:80
+  ports:
+    - 4200:80
+```
       
 # Customization details
 This build of ADW 5 has a component for uploading file plan spreadsheets and creating retention categories with the file plan in Alfresco.

@@ -27,7 +27,7 @@ In order to utilize the angular app, a modification must be made to the existing
             absolute_redirect off;                                                               
         }     
 
-this will setup an endpoint like:  localhost:8080/fileupload which will proxy over to this custom ADW app
+this will setup an endpoint like:  localhost:8080/fileplanupload which will proxy over to this custom ADW app
 
 There's also a microservice available that needs to be configured with a .env file
 

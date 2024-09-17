@@ -1,12 +1,19 @@
 # Customization getting started
-In order to utilize this customization within an existing Alfresco docker collection, add the following section to the docker-compose.yml for alfresco
+1.  In order to utilize this customization within an existing Alfresco docker collection, add the following section to the docker-compose.yml for alfresco (place at the top)
 
 
 ```
-fileplanuploadadw5:
-  image: wildsdocker/fileplanuploadadw5:v1
-  ports:
-    - 4200:80
+  fileplanuploadadw5:
+    image: wildsdocker/fileplanuploadadw5:v1
+    ports:
+      - 4200:80
+  queryalfapi:
+    image: wildsdocker/queryalfapi:v1
+    mem_limit: 200m
+    ports:
+      - 9600:9600
+    links:
+      - alfresco
 ```
       
 # Customization details
@@ -22,6 +29,31 @@ In order to utilize the angular app, a modification must be made to the existing
 
 this will setup an endpoint like:  localhost:8080/fileupload which will proxy over to this custom ADW app
 
+There's also a microservice available that needs to be configured with a .env file
+
+wtihin the queryalfapi container, copy the envTemplate.txt file to .env:
+
+cp envTemplate.txt .env
+
+then edit the .env:
+
+vi .env
+
+Now you can enter the appropriate values for the base url and the api url.  here's an example of what the .env should look like
+```
+BASE_URL="http://localhost:8080"
+API_URL = 'http://localhost:9600/static/swagger.json'
+user="admin"
+pass="admin"
+devpath = "../src/assets/"
+prodpath = "./static/"
+port="9600"
+elasticid=""
+elasticapikey=""
+baseFilePlanID="40bcb352-b748-4c18-bcb3-52b7485c1888"
+```
+
+once you save the .env, restart the queryalfapi container.  YOu can test the status of the microservice by going to http://<yoururl>:9600.  you should see swagger
 #  Using File Plan Upload
 
 Once the angular app loads, click on "All Libraries"  .  You will see a button called import file plans.  clicking this button will show a dialog where you can select the csv file that contains the file plans.  Selecting a file will show the next screen where you can select/de-select rows then click submit.  

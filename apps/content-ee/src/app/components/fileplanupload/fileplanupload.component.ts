@@ -80,14 +80,6 @@ export class FileplanuploadComponent implements OnInit {
 
   name = "Angular";
 
-  // Http Options
-  httpOptions = {
-    headers: new HttpHeaders({
-      "Content-Type": "application/json",
-      "Access-Control-Allow-Origin": "*",
-    }),
-  };
-
   @ViewChild(MatAccordion) accordion: MatAccordion;
 
   @ViewChild("fileImportInput") fileImportInput: any;
@@ -148,11 +140,15 @@ export class FileplanuploadComponent implements OnInit {
   }
 
   submitFilePlanButton() {
+    const headers = new HttpHeaders({
+      "Content-Type": "application/json; charset=UTF-8",
+    });
+
     //console.log(JSON.stringify(this.selection.selected));
     this.confirmationPanelElement.open();
     //now send to microservice
     this.http
-      .post(this.apiURL, this.selection.selected, this.httpOptions)
+      .post(this.apiURL, this.selection.selected, { headers })
       .subscribe((res) => {
         console.log(
           "api url is--> " +

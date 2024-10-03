@@ -14,11 +14,11 @@ There are volumes setup to configure nginx for the custom ADW and the provided n
   There is a csv file located within this project called grs-csv-transmittal34-USE_THIS.csv.  this contains 2 entries that can be used as an initial load of file plans.  The Record title, classification general and retention years columns are the primary columns to exhibit in a demo.   changing these values will reflect nicely in the records management site in ADW or Share but Share will give more details as to the retention schedule.  
 
   the general taxonomy is
-
+```
   Classification general (root)
   --- Record Title (this has the file plan)
   ------- All Files (folder to actual store the records)
-
+```
 # Alfresco Applications
 
 The repository is based on the [Nx Workspace](https://nx.dev/) and contains the following Alfresco applications and libraries built with Angular and [ADF](https://github.com/Alfresco/alfresco-ng2-components):

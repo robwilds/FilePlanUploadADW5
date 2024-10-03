@@ -1,64 +1,23 @@
 # Customization getting started
-1.  In order to utilize this customization within an existing Alfresco docker collection, add the following section to the docker-compose.yml for alfresco (place at the top)
+There's a fully composed yaml file that contains the entries for the customized ADW implementation with file plan upload, the microservice (python app) to process the requests and the entire Alfresco 23.3 enterprise stack.  Simply run docker compose up -d to fire up the solution.  
 
-
-```
-  fileplanuploadadw5:
-    image: wildsdocker/fileplanuploadadw5:v1
-    ports:
-      - 4200:80
-  queryalfapi:
-    image: wildsdocker/queryalfapi:v1
-    mem_limit: 200m
-    ports:
-      - 9600:9600
-    links:
-      - alfresco
-```
+There are volumes setup to configure nginx for the custom ADW and the provided nginx container for alfresco.  The yaml also has environment variables for the microservice (queryalfrescoapi) to run properly however when running locally you should not have to modify these values
       
 # Customization details
-This build of ADW 5 has a component for uploading file plan spreadsheets and creating retention categories with the file plan in Alfresco.
+1.  Verify the python microservice is running by accessing http://localhost:9600.  you should see swagger
 
-In order to utilize the angular app, a modification must be made to the existing alfresco nginx provided proxy container (running nginx).  On the "proxy" container, edit the etc/nginx/nginx.conf and add the following entry in the server section
+2.  Verify the custom adw app is available by access http://localhost:8080/fileplanupload.  you should see ADW.  Click on "All Libraries" and you should see a button called "File Plan UPload"
 
-                                                                    
-        location /fileupload/ {                                                                  
-            proxy_pass http://fileplanuploadadw5/;                                               
-            absolute_redirect off;                                                               
-        }     
+3.  If you would like to install OOTB support tools, run the install_amps.sh file in the supportTools directory then restart the alfresco and share containers
 
-this will setup an endpoint like:  localhost:8080/fileplanupload which will proxy over to this custom ADW app
+# Running the File Plan Upload
+  There is a csv file located within this project called grs-csv-transmittal34-USE_THIS.csv.  this contains 2 entries that can be used as an initial load of file plans.  The Record title, classification general and retention years columns are the primary columns to exhibit in a demo.   changing these values will reflect nicely in the records management site in ADW or Share but Share will give more details as to the retention schedule.  
 
-There's also a microservice available that needs to be configured with a .env file
+  the general taxonomy is
 
-wtihin the queryalfapi container, copy the envTemplate.txt file to .env:
-
-cp envTemplate.txt .env
-
-then edit the .env:
-
-vi .env
-
-Now you can enter the appropriate values for the base url and the api url.  here's an example of what the .env should look like
-```
-BASE_URL="http://localhost:8080"
-API_URL = 'http://localhost:9600/static/swagger.json'
-user="admin"
-pass="admin"
-devpath = "../src/assets/"
-prodpath = "./static/"
-port="9600"
-elasticid=""
-elasticapikey=""
-baseFilePlanID="40bcb352-b748-4c18-bcb3-52b7485c1888"
-```
-
-once you save the .env, restart the queryalfapi container.  YOu can test the status of the microservice by going to http://<yoururl>:9600.  you should see swagger
-#  Using File Plan Upload
-
-Once the angular app loads, click on "All Libraries"  .  You will see a button called import file plans.  clicking this button will show a dialog where you can select the csv file that contains the file plans.  Selecting a file will show the next screen where you can select/de-select rows then click submit.  
-
-The confirmation screen will indicate success or failure of the upload.  If successful, you can now go to the library> REcords Management and view the file plans in ADW.  Share interface will show more details about the file plan such as the retention schedule
+  Classification general (root)
+  --- Record Title (this has the file plan)
+  ------- All Files (folder to actual store the records)
 
 # Alfresco Applications
 

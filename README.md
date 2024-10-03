@@ -11,7 +11,18 @@ There are volumes setup to configure nginx for the custom ADW and the provided n
 3.  If you would like to install OOTB support tools, run the install_amps.sh file in the supportTools directory then restart the alfresco and share containers
 
 # Running the File Plan Upload
-  There is a csv file located within this project called grs-csv-transmittal34-USE_THIS.csv.  this contains 2 entries that can be used as an initial load of file plans.  The Record title, classification general and retention years columns are the primary columns to exhibit in a demo.   changing these values will reflect nicely in the records management site in ADW or Share but Share will give more details as to the retention schedule.  
+  There is a csv file located within this project called grs-csv-transmittal34-USE_THIS.csv.  This contains 2 entries that can be used as an initial load of file plans.  The Record title, classification general and retention years columns are the primary columns to exhibit in a demo.  You can also edit the notes columns.   Changing these values will reflect nicely in the records management site in ADW or Share but Share will give more details as to the retention schedule.  
+
+Step 1.  click on all libraries and observe a button called File Plan Upload
+<img width="849" alt="image" src="https://github.com/user-attachments/assets/544ca0ec-84bc-40af-94b8-fb2a00abd436">
+
+Step 2.  click the choose file button and select your file
+<img width="489" alt="image" src="https://github.com/user-attachments/assets/c8a2252b-f5d7-41a8-ac7c-188df59cd86f">
+
+Step 3.  now you will see a list of all the rows in the spreadsheet.  You can select the rows you'd like to import then click submit
+<img width="934" alt="image" src="https://github.com/user-attachments/assets/b4a95713-6547-4d45-8b98-9fc63c02ba4c">
+
+you will see a confirmation that the file plans were added.  you can now click off of the modal popup and navigate to the Records Management Site to see the file plans
 
   the general taxonomy is
 ```

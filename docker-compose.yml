@@ -38,7 +38,8 @@ services:
       elasticcloudid: "9ce78c3f7ab445339ebb510a901604fd:dXMtZWFzdC0yLmF3cy5lbGFzdGljLWNsb3VkLmNvbSQ3N2QxZDJiNGZjNWI0M2IxYmJiZjFmZDc1MzE1NmMyNyRhOTIyOWE3OWU1NTM0YjBlYTRmZTZlZjBlNjU1OTUxNQ=="
       elasticuser: "enterprise_search"
       elasticpassword: "hylandforce1"
-      baseFilePlanID: "71d1d22f-c458-452a-91d2-2fc458e52aee"
+      baseFilePlanID: ""
+      baseFilePlanQuery: '{"query": {"query": "select * from rma:filePlan","language": "cmis"}}'
   alfresco:
     # image: quay.io/alfresco/alfresco-content-repository:23.3.0
     image: quay.io/alfresco/alfresco-governance-repository-enterprise:23.3.0
@@ -170,6 +171,13 @@ services:
     ports:
       - 9200:9200
       - 9300:9300
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.10.1
+    ports:
+      - "5601:5601"
+    environment:
+      SERVER_NAME: kibana.example.org
+      ELASTICSEARCH_HOSTS: "http://elasticsearch:9200"
   search:
     image: quay.io/alfresco/alfresco-elasticsearch-live-indexing:4.1.0
     mem_limit: 1g

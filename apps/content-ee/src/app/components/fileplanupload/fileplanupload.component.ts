@@ -71,7 +71,6 @@ export class FileplanuploadComponent implements OnInit {
   isShowFilePlanForm = false;
   selection = new SelectionModel<FilePlanData>(true, []);
   convertedObj: any = "";
-  //apiURL = "http://localhost:9600/createfileplan";
   apiURL =
     window.location.protocol +
     "//" +
@@ -85,7 +84,6 @@ export class FileplanuploadComponent implements OnInit {
   @ViewChild("fileImportInput") fileImportInput: any;
   @ViewChild("importDisplayPanel", { static: true })
   importDisplayPanelElement: MatExpansionPanel;
-
   @ViewChild("confirmationPanel", { static: true })
   confirmationPanelElement: MatExpansionPanel;
 
@@ -124,9 +122,9 @@ export class FileplanuploadComponent implements OnInit {
     if (this.isAllSelected()) {
       this.selection.clear();
       return;
+    } else {
+      this.selection.select(...this.rowData);
     }
-
-    this.selection.select(...this.rowData.data);
   }
 
   /** The label for the checkbox on the passed row */

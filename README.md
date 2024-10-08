@@ -2,13 +2,16 @@
 There's a fully composed yaml file that contains the entries for the customized ADW implementation with file plan upload, the microservice (python app) to process the requests and the entire Alfresco 23.3 enterprise stack.  Simply run docker compose up -d to fire up the solution.  
 
 There are volumes setup to configure nginx for the custom ADW and the provided nginx container for alfresco.  The yaml also has environment variables for the microservice (queryalfrescoapi) to run properly however when running locally you should not have to modify these values
+
       
-# Customization details
+# Customization Getting Started
 1.  Verify the python microservice is running by accessing http://localhost:9600.  you should see swagger
 
 2.  Verify the custom adw app is available by access http://localhost:8080/fileplanupload.  you should see ADW.  Click on "All Libraries" and you should see a button called "File Plan UPload"
 
-3.  App must be licensed FIRST to run this step !!!.  If you would like to install OOTB support tools, run the install_amps.sh file in the supportTools directory then restart the alfresco and share containers
+3.  Within Share (http://localhost:8080/share), create the records management site (standard not DoD5015)
+
+4.  App must be licensed FIRST to run this step !!!.  If you would like to install OOTB support tools, run the install_amps.sh file in the supportTools directory then restart the alfresco and share containers
 
 # Running the File Plan Upload
   There is a csv file located within this project called grs-csv-transmittal34-USE_THIS.csv.  This contains 3 entries that can be used as an initial load of file plans.  The Record title, classification general and retention years columns are the primary columns to exhibit in a demo.  You can also edit the notes columns.   Changing these values will reflect nicely in the records management site in ADW or Share but Share will give more details as to the retention schedule.  

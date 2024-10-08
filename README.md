@@ -1,4 +1,4 @@
-# Customization getting started
+# Customization Overview
 There's a fully composed yaml file that contains the entries for the customized ADW implementation with file plan upload, the microservice (python app) to process the requests and the entire Alfresco 23.3 enterprise stack.  Simply run docker compose up -d to fire up the solution.  
 
 There are volumes setup to configure nginx for the custom ADW and the provided nginx container for alfresco.  The yaml also has environment variables for the microservice (queryalfrescoapi) to run properly however when running locally you should not have to modify these values

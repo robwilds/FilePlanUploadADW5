@@ -17,32 +17,9 @@
 # (cpu_*, mem_* limits) for non swarm mode in Compose
 version: "2"
 services:
-  fileplanuploadadw5:
-    image: wildsdocker/fileplanuploadadw5:v1
-    volumes:
-      - ${PWD}/dist/alfresco-digital-workspace/app.config.json:/usr/share/nginx/html/app.config.json
-  queryalfapi:
-    image: wildsdocker/queryalfapi:v2
-    mem_limit: 200m
-    ports:
-      - 9600:9600
-    environment:
-      BASE_URL: "http://alfresco:8080"
-      API_URL: "/static/swagger.json"
-      user: "admin"
-      pass: "admin"
-      devpath: "../src/assets/"
-      prodpath: "./static/"
-      port: "9600"
-      elasticapikey: ""
-      elasticcloudid: "9ce78c3f7ab445339ebb510a901604fd:dXMtZWFzdC0yLmF3cy5lbGFzdGljLWNsb3VkLmNvbSQ3N2QxZDJiNGZjNWI0M2IxYmJiZjFmZDc1MzE1NmMyNyRhOTIyOWE3OWU1NTM0YjBlYTRmZTZlZjBlNjU1OTUxNQ=="
-      elasticuser: "enterprise_search"
-      elasticpassword: "hylandforce1"
-      baseFilePlanID: ""
-      baseFilePlanQuery: '{"query": {"query": "select * from rma:filePlan","language": "cmis"}}'
   alfresco:
-    # image: quay.io/alfresco/alfresco-content-repository:23.3.0
-    image: quay.io/alfresco/alfresco-governance-repository-enterprise:23.3.0
+    #image: quay.io/alfresco/alfresco-content-repository:23.4.0-A15
+    image: quay.io/alfresco/alfresco-governance-repository-enterprise:23.4.0
     mem_limit: 1900m
     environment:
       JAVA_TOOL_OPTIONS: >-
@@ -63,7 +40,7 @@ services:
         -Delasticsearch.createIndexIfNotExists=true
         -Delasticsearch.host=elasticsearch
         -Delasticsearch.port=9200
-        -Dshare.host=127.0.0.1
+        -Dshare.host=localhost
         -Dshare.port=8080
         -Dalfresco.host=localhost
         -Dalfresco.port=8080
@@ -78,19 +55,34 @@ services:
         -Ddsync.service.uris=http://localhost:9090/alfresco
         -XX:MinRAMPercentage=50
         -XX:MaxRAMPercentage=80
+    volumes:
+      # Main ACS configuration file
+      - ./data/services/content/alfresco-global.properties:/usr/local/tomcat/shared/classes/alfresco-global.properties
     healthcheck:
       test:
-        - CMD
-        - curl
-        - -f
-        - http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:8080/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-",
+        ]
       interval: 30s
       timeout: 3s
-      retries: 3
+      retries: 5
       start_period: 1m
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.alfresco.rule=PathPrefix(`/`)"
+      - "traefik.http.services.alfresco.loadbalancer.server.port=8080"
+      - "traefik.http.routers.solrapideny.rule=PathRegexp(`^/alfresco/(wc)?s(ervice)?/api/solr/.*$`)"
+      - "traefik.http.middlewares.acsfakeauth.basicauth.users=fake:"
+      - "traefik.http.routers.solrapideny.middlewares=acsfakeauth@docker"
+      - "traefik.http.routers.alfrescomicrometer.rule=PathRegexp(`^/alfresco/(wc)?s(ervice)?/prometheus`)"
+      - "traefik.http.middlewares.prometheusipfilter.ipallowlist.sourcerange=127.0.0.0/8"
+      - "traefik.http.routers.alfrescomicrometer.middlewares=prometheusipfilter@docker"
   transform-router:
     mem_limit: 512m
-    image: quay.io/alfresco/alfresco-transform-router:4.1.4
+    image: quay.io/alfresco/alfresco-transform-router:4.1.5-A3
     environment:
       JAVA_OPTS: >-
         -XX:MinRAMPercentage=50
@@ -101,10 +93,19 @@ services:
         http://shared-file-store:8099/alfresco/api/-default-/private/sfs/versions/1/file
     ports:
       - "8095:8095"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8095/actuator/health"]
+      interval: 10s
+      timeout: 2s
+      retries: 3
+      start_period: 20s
     depends_on:
-      - activemq
+      activemq:
+        condition: service_healthy
+      shared-file-store:
+        condition: service_healthy
   transform-core-aio:
-    image: alfresco/alfresco-transform-core-aio:5.1.4
+    image: alfresco/alfresco-transform-core-aio:5.1.5-A3
     mem_limit: 1536m
     environment:
       JAVA_OPTS: >-
@@ -115,10 +116,19 @@ services:
         http://shared-file-store:8099/alfresco/api/-default-/private/sfs/versions/1/file
     ports:
       - "8090:8090"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8090/ready"]
+      interval: 20s
+      timeout: 2s
+      retries: 3
+      start_period: 10s
     depends_on:
-      - activemq
+      activemq:
+        condition: service_healthy
+      shared-file-store:
+        condition: service_healthy
   shared-file-store:
-    image: quay.io/alfresco/alfresco-shared-file-store:4.1.4
+    image: quay.io/alfresco/alfresco-shared-file-store:4.1.5-A3
     mem_limit: 512m
     environment:
       JAVA_OPTS: >-
@@ -128,13 +138,21 @@ services:
       scheduler.cleanup.interval: 86400000
     ports:
       - "8099:8099"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8099/ready"]
+      interval: 20s
+      timeout: 2s
+      retries: 3
+      start_period: 10s
     volumes:
       - shared-file-store-volume:/tmp/Alfresco/sfs
   share:
-    # image: quay.io/alfresco/alfresco-share:23.3.0
-    image: quay.io/alfresco/alfresco-governance-share-enterprise:23.3.0
+    #image: quay.io/alfresco/alfresco-share:23.4.0-A15
+    image: quay.io/alfresco/alfresco-governance-share-enterprise:23.4.0
     mem_limit: 1g
     environment:
+      CSRF_FILTER_ORIGIN: http://localhost:8080
+      CSRF_FILTER_REFERER: http://localhost:8080/share/.*
       REPO_HOST: "alfresco"
       REPO_PORT: "8080"
       JAVA_OPTS: >-
@@ -144,6 +162,22 @@ services:
         -Dalfresco.port=8080
         -Dalfresco.context=alfresco
         -Dalfresco.protocol=http
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/share"]
+      interval: 20s
+      timeout: 2s
+      retries: 3
+      start_period: 15s
+    depends_on:
+      alfresco:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.share.rule=PathPrefix(`/share`)"
+      - "traefik.http.services.share.loadbalancer.server.port=8080"
+      - "traefik.http.routers.proxiedsolrapideny.rule=PathRegexp(`^/share/proxy/alfresco(-(noauth|feed|api))?/api/solr/`)"
+      - "traefik.http.middlewares.sharefakeauth.basicauth.users=fake:"
+      - "traefik.http.routers.proxiedsolrapideny.middlewares=sharefakeauth@docker"
   postgres:
     image: postgres:14.4
     mem_limit: 512m
@@ -154,8 +188,14 @@ services:
     command: postgres -c max_connections=300 -c log_min_messages=LOG
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
   elasticsearch:
-    image: elasticsearch:7.10.1
+    image: elasticsearch:7.17.3
     environment:
       - xpack.security.enabled=false
       - discovery.type=single-node
@@ -171,21 +211,36 @@ services:
     ports:
       - 9200:9200
       - 9300:9300
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "curl -s -X GET http://localhost:9200/_cluster/health?pretty | grep status | grep -q '\\(green\\|yellow\\)'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.10.1
+    image: kibana:7.17.3
+    mem_limit: 1g
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     ports:
       - "5601:5601"
-    environment:
-      SERVER_NAME: kibana.example.org
-      ELASTICSEARCH_HOSTS: "http://elasticsearch:9200"
-  search:
-    image: quay.io/alfresco/alfresco-elasticsearch-live-indexing:4.1.0
-    mem_limit: 1g
     depends_on:
       elasticsearch:
-        condition: service_started
-      search-reindexing:
-        condition: service_completed_successfully
+        condition: service_healthy
+    healthcheck:
+      test:
+        ["CMD", "curl", "-f", "-o", "/dev/null", "http://localhost:5601/status"]
+      interval: 10s
+      timeout: 2s
+      retries: 5
+      start_period: 30s
+  search:
+    image: quay.io/alfresco/alfresco-elasticsearch-live-indexing:4.2.0-A5
+    mem_limit: 1g
     environment:
       ALFRESCO_ACCEPTED_CONTENT_MEDIA_TYPES_CACHE_BASE_URL: >-
         http://transform-core-aio:8090/transform/config
@@ -193,10 +248,23 @@ services:
         http://shared-file-store:8099/alfresco/api/-default-/private/sfs/versions/1/file/
       SPRING_ACTIVEMQ_BROKERURL: nio://activemq:61616
       SPRING_ELASTICSEARCH_REST_URIS: http://elasticsearch:9200
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 20s
+      timeout: 2s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      transform-core-aio:
+        condition: service_healthy
+      shared-file-store:
+        condition: service_healthy
   search-reindexing:
-    image: quay.io/alfresco/alfresco-elasticsearch-reindexing:4.1.0
+    image: quay.io/alfresco/alfresco-elasticsearch-reindexing:4.2.0-A5
     mem_limit: 1g
-    restart: on-failure:10
+    restart: on-failure:5
     environment:
       ALFRESCO_ACCEPTED_CONTENT_MEDIA_TYPES_CACHE_BASE_URL: >-
         http://transform-core-aio:8090/transform/config
@@ -207,9 +275,9 @@ services:
       SPRING_ELASTICSEARCH_REST_URIS: http://elasticsearch:9200
     depends_on:
       postgres:
-        condition: service_started
+        condition: service_healthy
       elasticsearch:
-        condition: service_started
+        condition: service_healthy
       alfresco:
         condition: service_healthy
   activemq:
@@ -220,8 +288,24 @@ services:
       - "5672:5672" # AMQP
       - "61616:61616" # OpenWire
       - "61613:61613" # STOMP
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "/opt/activemq/bin/activemq",
+          "query",
+          "--objname",
+          "type=Broker,brokerName=*,service=Health",
+          "|",
+          "grep",
+          "Good",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
   digital-workspace:
-    image: quay.io/alfresco/alfresco-digital-workspace:5.0.0
+    image: quay.io/alfresco/alfresco-digital-workspace:5.1.0-11106981658
     mem_limit: 128m
     environment:
       APP_CONFIG_PROVIDER: "ECM"
@@ -230,27 +314,89 @@ services:
       APP_CONFIG_PLUGIN_PROCESS_SERVICE: "false"
       APP_CONFIG_PLUGIN_MICROSOFT_ONLINE: "false"
       APP_BASE_SHARE_URL: "http://localhost:8080/workspace/#/preview/s"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 1s
+      retries: 3
+      start_period: 1s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.adw.rule=PathPrefix(`/workspace`)"
+      - "traefik.http.middlewares.adwforceslash.redirectregex.regex=^(.*/workspace)$$"
+      - "traefik.http.middlewares.adwforceslash.redirectregex.replacement=$${1}/"
+      - "traefik.http.middlewares.adwroot.stripprefix.prefixes=/workspace"
+      - "traefik.http.middlewares.adwchain.chain.middlewares=adwforceslash,adwroot"
+      - "traefik.http.routers.adw.middlewares=adwchain@docker"
+  audit-storage:
+    image: quay.io/alfresco/alfresco-audit-storage:1.0.0-A1
+    mem_limit: 512m
+    environment:
+      SPRING_ACTIVEMQ_BROKERURL: failover:(nio://activemq:61616)?timeout=3000
+      AUDIT_ENTRYSTORAGE_OPENSEARCH_CONNECTOR_URI: http://elasticsearch:9200
+      AUDIT_ENTRYSTORAGE_OPENSEARCH_CONNECTOR_USERNAME: admin
+      AUDIT_ENTRYSTORAGE_OPENSEARCH_CONNECTOR_PASSWORD: admin
+      AUDIT_EVENTINGESTION_URI: activemq:topic:alfresco.repo.event2
+    healthcheck:
+      test:
+        ["CMD", "curl", "-f", "http://localhost:8081/actuator/health/readiness"]
+      interval: 60s
+      timeout: 2s
+      retries: 3
+      start_period: 15s
+    depends_on:
+      activemq:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
   control-center:
-    image: quay.io/alfresco/alfresco-control-center:9.0.0
+    image: quay.io/alfresco/alfresco-control-center:9.1.0-11106981658
     mem_limit: 128m
     environment:
       APP_CONFIG_PROVIDER: "ECM"
       APP_CONFIG_AUTH_TYPE: "BASIC"
       BASE_PATH: ./
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 1s
+      retries: 3
+      start_period: 1s
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.acc.rule=PathPrefix(`/control-center`) || PathPrefix(`/admin`)"
+      - "traefik.http.middlewares.accroot.stripprefix.prefixes=/admin,/control-center"
+      - "traefik.http.middlewares.accforceslash.redirectregex.regex=^(.*/(admin|control-center))$$"
+      - "traefik.http.middlewares.accforceslash.redirectregex.replacement=$${1}/"
+      - "traefik.http.middlewares.accchain.chain.middlewares=accforceslash,accroot"
+      - "traefik.http.routers.acc.middlewares=accchain@docker"
   proxy:
-    image: alfresco/alfresco-acs-nginx:3.4.2
+    image: traefik:3.1
     mem_limit: 128m
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:8080"
+      - "--entryPoints.traefik.address=:8888"
+      - "--accesslog=true"
+      - "--providers.docker.exposedByDefault=false"
+      - "--ping.entrypoint=web"
+      - "--ping=true"
     ports:
       - "8080:8080"
-    depends_on:
-      - digital-workspace
-      - alfresco
-      - share
-      - control-center
+      - "8888:8888"
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 20s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    security_opt:
+      - label=disable # Required for accessing the Docker socket on Selinux enabled systems
     volumes:
-      - ${PWD}/nginxforalfresco.conf:/etc/nginx/nginx.conf
+      - /var/run/docker.sock:/var/run/docker.sock:ro
   sync-service:
-    image: quay.io/alfresco/service-sync:4.0.1
+    image: quay.io/alfresco/service-sync:5.1.0-M2
     mem_limit: 1g
     environment:
       JAVA_OPTS: >-
@@ -266,14 +412,86 @@ services:
         -XX:MaxRAMPercentage=80
     ports:
       - "9090:9090"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9090/alfresco/healthcheck"]
+      interval: 30s
+      timeout: 2s
+      retries: 3
+      start_period: 20s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      alfresco:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.syncservice.rule=PathPrefix(`/syncservice`)"
+      - "traefik.http.services.sync-service.loadbalancer.server.port=9090"
+      - "traefik.http.middlewares.syncservice.replacepathregex.regex=^/syncservice/(.*)"
+      - "traefik.http.middlewares.syncservice.replacepathregex.replacement=/alfresco/$$1"
+      - "traefik.http.routers.syncservice.middlewares=syncservice@docker"
   dozzle:
     image: amir20/dozzle:latest
-    environment:
-      DOZZLE_BASE: "/dozzle"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     ports:
       - 9999:8080
+  process:
+    image: alfresco/process-services:24.1.0
+    ports:
+      - 8094:8080
+    depends_on:
+      - postgres
+    volumes:
+      # APS storage, such as files attached to in-flight workflows
+      #- $(pwd)\data\services\process\tomcatdata:/usr/local/tomcat/bin/data/
+      # Log storage
+      - ./data/services/process/logs:/usr/local/tomcat/logs/
+      # APS properties exposed to the host
+      - ./data/services/process/configs/activiti-app/activiti-app.properties:/usr/local/tomcat/webapps/activiti-app/WEB-INF/classes/META-INF/activiti-app/activiti-app.properties
+  processadmin:
+    image: alfresco/process-services-admin:24.1.0
+    ports:
+      - 8096:8080
+  fileplanuploadadw5:
+    image: wildsdocker/fileplanuploadadw5:v1
+    volumes:
+      - ./data/services/fileplanuploadadw5/app.config.json:/usr/share/nginx/html/app.config.json
+    ports:
+      - 4200:80
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fileplanuploadadw5.rule=PathPrefix(`/fileplanupload`)"
+  queryalfapi:
+    image: wildsdocker/queryalfapi:v3
+    restart: always
+    ports:
+      - 9600:9600
+    ulimits:
+          memlock: -1
+    volumes:
+      # downloaded shards
+      - ./data/LLMs/:/root/.cache/
+    environment:
+      BASE_URL: "http://alfresco:8080"
+      API_URL: "/static/swagger.json"
+      user: "admin"
+      pass: "admin"
+      devpath: "../src/assets/"
+      prodpath: "./static/"
+      port: "9600"
+      elasticapikey: ""
+      elasticcloudid: "123445"
+      elasticuser: "enterprise_search"
+      elasticpassword: "hylandforce1"
+      baseFilePlanID: ""
+      baseFilePlanQuery: '{"query": {"query": "select * from rma:filePlan","language": "cmis"}}'
+      OPEN_API_KEY: ""
+      HUGGING_FACE_HUB_TOKEN: ""
+      microsoft_model: "microsoft/Florence-2-base"
+      llama_vision_model: "unsloth/Llama-3.2-11B-Vision-Instruct"
+      llama_chat_repo: "hugging-quants/Llama-3.2-1B-Instruct-Q4_K_M-GGUF"
+      llama_chat_filename: "llama-3.2-1b-instruct-q4_k_m.gguf"
 volumes:
   shared-file-store-volume:
     driver_opts:

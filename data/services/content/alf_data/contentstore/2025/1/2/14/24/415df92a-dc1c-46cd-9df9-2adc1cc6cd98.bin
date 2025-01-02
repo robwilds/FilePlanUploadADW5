@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model xmlns="http://www.alfresco.org/model/dictionary/1.0" name="dynsc:dynamicSecurityMarksModel">
+    <author>System</author>
+    <imports/>
+    <namespaces>
+        <namespace uri="http://www.alfresco.org/model/dynsecuritymarks/1.0" prefix="dynsc"/>
+    </namespaces>
+    <data-types/>
+    <constraints/>
+    <types/>
+    <aspects/>
+</model>

@@ -58,6 +58,8 @@ services:
     volumes:
       # Main ACS configuration file
       - ./data/services/content/alfresco-global.properties:/usr/local/tomcat/shared/classes/alfresco-global.properties
+      - ./data/services/content/alf_data:/usr/local/tomcat/alf_data/
+      - ./data/services/content/amps:/usr/local/tomcat/amps
     healthcheck:
       test:
         [
@@ -188,6 +190,8 @@ services:
     command: postgres -c max_connections=300 -c log_min_messages=LOG
     ports:
       - "5432:5432"
+    volumes:
+      - ./data/services/postgres/data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER"]
       interval: 10s

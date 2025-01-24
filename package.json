@@ -4,7 +4,7 @@
   "version": "5.0.0",
   "author": "Hyland Software, Inc. and its affiliates",
   "scripts": {
-    "build": "nx build",
+    "build": "nx build --prod",
     "start": "nx serve",
     "lint": "nx lint",
     "adf-update": "./scripts/adf-update.mjs",

@@ -463,12 +463,24 @@ services:
       - ./data/services/fileplanuploadadw5/app.config.json:/usr/share/nginx/html/app.config.json
     ports:
       - 4200:80
+    environment:
+      APP_CONFIG_PROVIDER: "ECM"
+      APP_CONFIG_AUTH_TYPE: "BASIC"
+      BASE_PATH: ./fileplanupload
+      APP_CONFIG_PLUGIN_PROCESS_SERVICE: "false"
+      APP_CONFIG_PLUGIN_MICROSOFT_ONLINE: "false"
+      APP_BASE_SHARE_URL: "http://localhost:8080/workspace/#/preview/s"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.fileplanuploadadw5.rule=PathPrefix(`/fileplanupload`)"
+      - "traefik.http.routers.fpl.rule=PathPrefix(`/fileplanupload`)"
+      - "traefik.http.middlewares.fplforceslash.redirectregex.regex=^(.*/fileplanupload)$$"
+      - "traefik.http.middlewares.fplforceslash.redirectregex.replacement=$${1}/"
+      - "traefik.http.middlewares.fplroot.stripprefix.prefixes=/fileplanupload"
+      - "traefik.http.middlewares.fplchain.chain.middlewares=fplforceslash,fplroot"
+      - "traefik.http.routers.fpl.middlewares=fplchain@docker"
   queryalfapi:
     image: wildsdocker/queryalfapi:v3
-    restart: always
+    restart: on-failure
     ports:
       - 9600:9600
     deploy:

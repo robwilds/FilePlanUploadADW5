@@ -6,4 +6,6 @@ RUN apt-get -y update && apt-get -y install vim
 # default location
 COPY nginxforfileplan.conf /etc/nginx/nginx.conf
 # copy the built Angular app files to the default nginx html directory
-COPY /dist/alfresco-digital-workspace /usr/share/nginx/html
+
+WORKDIR /usr/share/nginx/html/fileplanupload
+COPY /dist/alfresco-digital-workspace /usr/share/nginx/html/fileplanupload

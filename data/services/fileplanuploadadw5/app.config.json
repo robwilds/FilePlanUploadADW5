@@ -3,7 +3,7 @@
     "ecmHost": "{protocol}//{hostname}{:port}",
     "bpmHost": "{protocol}//{hostname}{:port}",
     "aosHost": "{protocol}//{hostname}{:port}/alfresco/aos",
-    "baseShareUrl": "http://localhost:8080/share/#/preview/s",
+    "baseShareUrl": "{protocol}//{hostname}{:port}/share/#/preview/s",
     "providers": "ECM",
     "authType": "BASIC",
     "identityHost": "{protocol}//{hostname}{:port}/auth/admin/realms/alfresco",

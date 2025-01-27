@@ -460,7 +460,7 @@ services:
   fileplanuploadadw5:
     image: wildsdocker/fileplanuploadadw5:v1
     volumes:
-      - ./data/services/fileplanuploadadw5/app.config.json:/usr/share/nginx/html/app.config.json
+      - ./data/services/fileplanuploadadw5/app.config.json:/usr/share/nginx/html/fileplanupload/app.config.json
     ports:
       - 4200:80
     environment:

@@ -1,0 +1,70 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "description": "This is swagger for creating Alfresco file plans using python and a custom angular front end",
+      "version": "1.0.7",
+      "title": "PythonFilePlanCreation",
+      "termsOfService": "http://swagger.io/terms/",
+      "contact": {
+        "email": "robert.wilds@hyland.com"
+      },
+      "license": {
+        "name": "Apache 2.0",
+        "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+      }
+    },
+    "host": "",
+    "basePath": "/",
+    "tags": [
+    ],
+    "schemes": [
+      "http"
+    ],
+    "paths": {
+      "/createfileplan": {
+        "post": {
+          "tags": [
+          ],
+          "summary": "create file plan based on json input",
+          
+          "description": "JSON provided from csv spreadsheet via angular application to create file plan.  \n The spreadsheet is based on NARA GRS CSV file\nHere's the json payload that must be fed to this end point:\n [{\n\"GRSID\": \"GRS_1.1.001\",\n \"RecordTitle\": \"Financial management and reporting administrative records\",\n\"ClassificationGeneral\": \"Financial Management\",\n\"LegalCitation\": \"\",\n\"Disposition\": \"Temporary\",\n\"RetentionYears\": \"3\",\n\"RetentionType\": \"Creation_Age\",\n\"EventTypeGeneral\": \"\",\n\"LongerRetentionAuthorized\": \"Yes\",\n\"DeviationsAllowed\": \"Yes\",\n\"FullDispositionInstruction\": \"Destroy when 3 years old but longer retention is authorized if needed for business use.\",\n\"DispositionAuthority\": \"DAA-GRS-2016-0013-0001\",\n\"Supersededby\": \"\",\n\"LastUpdated\": \"23-Jun\",\n\"Comments\": \"6/2023: Corrected GRS ID.\"}]",
+         
+          "produces": [
+            "application/json"
+          ],
+          
+          "parameters": [
+            {
+              "name": "formData",
+              "in": "body",
+              "description": "JSON payload",
+              "required": true
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "successful operation",
+              "schema": {
+              }
+            },
+            "400": {
+              "description": "payload not correct"
+            },
+            "404": {
+              "description": "some other issue"
+            }
+          },
+          "security": [
+            {
+              "api_key": []
+            }
+          ]
+        }
+      }
+    }
+  ,
+    "externalDocs": {
+      "description": "Find out more about Swagger",
+      "url": "http://swagger.io"
+    }
+  }

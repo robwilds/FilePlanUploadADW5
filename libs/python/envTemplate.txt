@@ -1,0 +1,8 @@
+BASE_URL="http://host.docker.internal:8080"
+API_URL = '/static/swagger.json'
+baseFilePlanQuery = '{"query": {"query": "select * from rma:filePlan","language": "cmis"}}'
+user="demo"
+pass="demo"
+devpath = "../src/assets/"
+prodpath = "./static/"
+port="9600"

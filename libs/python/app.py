@@ -1,5 +1,3 @@
-
-import pandas as pd
 import createFilePlan.createFilePlan as CFP
 import os
 from dotenv import load_dotenv
